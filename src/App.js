@@ -1,23 +1,25 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 
-import MoviesList from "./components/MoviesList";
-import "./App.css";
+import MoviesList from './components/MoviesList';
+import AddMovie from './components/AddMovie';
+import './App.css';
 
 function App() {
-  const [movies, setMovies] = useState([]); //movie getting state
-  const [isLoading, setIsLoading] = useState(false); //Loading state
-  const [error, setError] = useState(null); //Error state to handle error response from server such as 401, 403
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const fecthMoviesHandler = useCallback(async () => {  //use of useCallback to save the state of function so the useState below does not rerendes the function mentioned in the dependency to create a infinite loop of rendering
+  const fetchMoviesHandler = useCallback(async () => {
     setIsLoading(true);
-    setError(null); //clear previos errors from the previous request
+    setError(null);
     try {
-      const response = await fetch("https://swapi.dev/api/film/");
+      const response = await fetch('https://swapi.dev/api/films/');
       if (!response.ok) {
-        throw new Error("Something went wrong!");
+        throw new Error('Something went wrong!');
       }
+
       const data = await response.json();
-      //Transforming the movie data to an object using map function to access values within the Item of results array which is being passed as props to the list of movie
+
       const transformedMovies = data.results.map((movieData) => {
         return {
           id: movieData.episode_id,
@@ -34,20 +36,36 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fecthMoviesHandler();
-  }, [fecthMoviesHandler]); //dependency of same func added if there is a chance of any state dependency in the same fucntion
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler]);
+
+  function addMovieHandler(movie) {
+    console.log(movie);
+  }
+
+  let content = <p>Found no movies.</p>;
+
+  if (movies.length > 0) {
+    content = <MoviesList movies={movies} />;
+  }
+
+  if (error) {
+    content = <p>{error}</p>;
+  }
+
+  if (isLoading) {
+    content = <p>Loading...</p>;
+  }
 
   return (
     <React.Fragment>
       <section>
-        <button onClick={fecthMoviesHandler}>Fetch Movies</button>
+        <AddMovie onAddMovie={addMovieHandler} />
       </section>
       <section>
-        {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
-        {!isLoading && movies.length === 0 && !error && <p>Found no Movies.</p>}
-        {isLoading && <p>Loading... Please wait!</p>}
-        {!isLoading && error && <p>{error}</p>}
+        <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
+      <section>{content}</section>
     </React.Fragment>
   );
 }
