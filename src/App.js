@@ -20,23 +20,19 @@ function App() {
   //   },
   // ];
 
-  function fecthMoviesHandler() {
-    fetch("https://swapi.dev/api/films/")
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        //Transforming the movie data to an object using map function to access values within the Item of results array which is being passed as props to the list of movie
-        const transformedMovies = data.results.map((movieData) => {
-          return {
-            id: movieData.episode_id,
-            title: movieData.title,
-            openingText: movieData.opening_crawl,
-            releaseDate: movieData.release_date,
-          };
-        });
-        setMovies(transformedMovies);
-      });
+  async function fecthMoviesHandler() {
+    const response = await fetch("https://swapi.dev/api/films/");
+    const data = await response.json();
+    //Transforming the movie data to an object using map function to access values within the Item of results array which is being passed as props to the list of movie
+    const transformedMovies = data.results.map((movieData) => {
+      return {
+        id: movieData.episode_id,
+        title: movieData.title,
+        openingText: movieData.opening_crawl,
+        releaseDate: movieData.release_date,
+      };
+    });
+    setMovies(transformedMovies);
   }
 
   return (
