@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
@@ -8,7 +8,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false); //Loading state
   const [error, setError] = useState(null); //Error state to handle error response from server such as 401, 403
 
-  async function fecthMoviesHandler() {
+  const fecthMoviesHandler = useCallback(async () => {  //use of useCallback to save the state of function so the useState below does not rerendes the function mentioned in the dependency to create a infinite loop of rendering
     setIsLoading(true);
     setError(null); //clear previos errors from the previous request
     try {
@@ -31,7 +31,11 @@ function App() {
       setError(error.message);
     }
     setIsLoading(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    fecthMoviesHandler();
+  }, [fecthMoviesHandler]); //dependency of same func added if there is a chance of any state dependency in the same fucntion
 
   return (
     <React.Fragment>
